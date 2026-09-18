@@ -1,0 +1,18 @@
+serverAddr = "CHANGE_ME"
+serverPort = 7000
+
+auth.method = "token"
+auth.token = "CHANGE_ME"
+
+log.to = "./state/hermi_frp/frpc.log"
+log.level = "info"
+log.maxDays = 7
+
+[[proxies]]
+name = "hermi-web"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 8789
+remotePort = 18789
+transport.useEncryption = true
+transport.useCompression = true

@@ -1,0 +1,13 @@
+secrets.local.env
+.env*
+state/
+logs/
+media/
+*.db
+*.db-*
+*.log
+*.jsonl
+__pycache__/
+.pytest_cache/
+*.bak*
+frp/*.local.toml

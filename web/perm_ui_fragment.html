@@ -1,0 +1,36 @@
+<header class="panel-header">
+  <div>
+    <p class="eyebrow">Users</p>
+    <h2>用户管理</h2>
+  </div>
+</header>
+<form id="admin-user-form" class="admin-user-form">
+  <input id="admin-user-id" placeholder="user_id，如 friend:alice" />
+  <input id="admin-display-name" placeholder="显示名" />
+  <input id="admin-token" placeholder="token，可留空自动生成" />
+  <select id="admin-role">
+    <option value="friend">friend（朋友）</option>
+    <option value="guest">guest（访客）</option>
+  </select>
+  <button type="submit">创建</button>
+</form>
+
+<div id="admin-user-list" class="admin-user-list"></div>
+
+<!-- 权限配置详情模态框 -->
+<div id="perm-detail-modal" class="modal-backdrop" hidden>
+  <section class="modal-panel" aria-label="权限配置详情">
+    <header class="panel-header">
+      <div>
+        <p class="eyebrow">Permission</p>
+        <h2 id="perm-detail-title">权限配置</h2>
+      </div>
+      <button id="perm-detail-close" class="icon-button" type="button" aria-label="关闭">×</button>
+    </header>
+    <div id="perm-detail-body" class="perm-detail-body"></div>
+    <div class="perm-detail-actions">
+      <button id="perm-detail-save" class="primary-button" type="button">保存</button>
+      <button id="perm-detail-cancel" class="secondary-button" type="button">取消</button>
+    </div>
+  </section>
+</div>

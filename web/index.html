@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#111827" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="stylesheet" href="/styles.css" />
+    <title>Hermi</title>
+  </head>
+  <body>
+    <main class="shell">
+      <div id="drawer-backdrop" class="drawer-backdrop" hidden></div>
+
+      <aside id="conversation-panel" class="rail panel" aria-label="会话列表" data-i18n-aria="conversation_list">
+        <div class="brand">
+          <span class="brand-mark">H</span>
+          <span>Hermi</span>
+        </div>
+        <div class="new-entry-actions">
+          <button id="new-conversation" class="primary-button" type="button" data-i18n="new_conversation">新会话</button>
+          <button id="new-meeting" class="secondary-button" type="button" data-i18n="new_meeting">新会议</button>
+        </div>
+        <nav id="conversation-list" class="conversation-list">
+          <section class="nav-section" aria-label="Hermi会话">
+            <div id="hermi-conversation-groups" class="nav-section-list">
+              <div id="hermi-conversation-list" class="nav-section-list"></div>
+            </div>
+          </section>
+          <section id="room-nav-section" class="nav-section" aria-label="会议室">
+            <h3 class="nav-section-title" data-i18n="meeting_rooms">会议室</h3>
+            <div id="room-list" class="nav-section-list"></div>
+          </section>
+          <section id="other-conversation-section" class="nav-section" aria-label="他人会话">
+            <h3 class="nav-section-title" data-i18n="other_conversations">他人会话</h3>
+            <div id="other-conversation-list" class="nav-section-list"></div>
+          </section>
+          <section id="api-conversation-section" class="nav-section" aria-label="API会话">
+            <h3 class="nav-section-title" data-i18n="api_conversations">API会话</h3>
+            <div id="api-conversation-list" class="nav-section-list"></div>
+          </section>
+          <section class="nav-section" aria-label="定时任务">
+            <h3 class="nav-section-title" data-i18n="scheduled_jobs">定时任务</h3>
+            <div id="scheduled-job-list" class="nav-section-list"></div>
+          </section>
+          <section class="nav-section efficiency-section" aria-label="共生网络">
+            <h3 class="nav-section-title" data-i18n="symbiosis_network">共生网络</h3>
+            <div id="efficiency-organization-list" class="nav-section-list">
+              <button class="conversation-open efficiency-placeholder" type="button" data-symbiosis-entry="evolution" data-i18n="evolution_station">演化观测站</button>
+              <button class="conversation-open efficiency-placeholder" type="button" data-exception-entry="monitor" data-i18n="exception_center">异常处理中心</button>
+              <button class="conversation-open efficiency-placeholder" type="button" data-efficiency-placeholder="深空通讯舱" data-i18n="deep_space_comms">深空通讯舱</button>
+            </div>
+          </section>
+        </nav>
+        <div class="panel-footer">
+          <div class="connection-row">
+            <div id="connection" class="status" data-state="warn">链接中断</div>
+            <button id="account-menu-button" class="account-menu-button" type="button" hidden aria-expanded="false" aria-controls="account-menu">
+              <span>(</span><span id="account-display-name"></span><span>)</span><span class="account-menu-caret" aria-hidden="true">⌄</span>
+            </button>
+            <button id="app-download-button" class="icon-button app-download-button" type="button" title="下载 Hermi APP" aria-label="下载 Hermi APP">⇩</button>
+          </div>
+          <div id="account-menu" class="account-menu" hidden>
+            <button id="account-quota-button" class="account-menu-quota" type="button" disabled>
+              <span id="account-quota-label" data-i18n="remaining_quota">剩余额度</span>
+              <span id="account-quota-reset"></span>
+            </button>
+            <button id="account-settings-button" type="button" data-i18n="account_settings">账户设置</button>
+            <div class="account-language-menu">
+              <button id="account-language-button" type="button" aria-haspopup="menu" aria-expanded="false" data-i18n="interface_language">界面语言</button>
+              <div id="account-language-options" class="account-language-options" role="menu">
+                <button type="button" data-interface-locale="zh-CN" role="menuitem">中文</button>
+                <button type="button" data-interface-locale="ja-JP" role="menuitem">日本語</button>
+                <button type="button" data-interface-locale="en-US" role="menuitem">English</button>
+              </div>
+            </div>
+            <button id="account-logout-button" class="account-logout-button" type="button" data-i18n="logout">退出登录</button>
+          </div>
+          <form id="token-form" class="token-form">
+            <input id="token-input" class="token-input" placeholder="访问令牌" data-i18n-placeholder="access_token" type="password" autocomplete="current-password" />
+            <button id="token-submit" class="token-button" type="submit" data-i18n="login">登录</button>
+          </form>
+        </div>
+      </aside>
+
+      <section class="chat" aria-label="消息" data-i18n-aria="messages">
+        <header class="chat-header">
+          <button id="left-panel-toggle" class="icon-button" type="button" aria-label="打开会话" data-i18n-aria="open_conversations">☰</button>
+          <div class="chat-title">
+            <button id="display-mode-toggle" class="mode-toggle" type="button">Owner console</button>
+            <h1 id="conversation-title">Hermi</h1>
+            <div id="symbiosis-top-title" class="symbiosis-top-title" hidden>
+              <p id="symbiosis-top-eyebrow">共生网络</p>
+              <h1 id="symbiosis-top-heading">演化观测站</h1>
+            </div>
+          </div>
+          <button id="right-panel-toggle" class="icon-button" type="button" aria-label="打开审批" data-i18n-aria="open_approvals">✓</button>
+        </header>
+
+        <section id="symbiosis-workspace" class="symbiosis-workspace" aria-label="演化观测站" hidden>
+          <header class="symbiosis-header">
+            <button id="symbiosis-return" class="icon-button symbiosis-return" type="button" aria-label="返回聊天" title="返回聊天" data-i18n-aria="return_to_chat" data-i18n-title="return_to_chat">×</button>
+          </header>
+          <div class="symbiosis-tabs" role="tablist" aria-label="演化观测站分页">
+            <button id="evolution-notes-tab" class="symbiosis-tab active" type="button" role="tab" aria-selected="true" data-i18n="evolution_notes">演化纪要</button>
+            <button id="evolution-blueprints-tab" class="symbiosis-tab" type="button" role="tab" aria-selected="false" data-i18n="evolution_blueprints">演化蓝图</button>
+            <button id="feature-proposals-tab" class="symbiosis-tab" type="button" role="tab" aria-selected="false" data-i18n="feature_proposals">功能议案</button>
+          </div>
+          <section id="evolution-notes-view" class="symbiosis-view" role="tabpanel" aria-labelledby="evolution-notes-tab">
+            <div id="evolution-notes-list" class="symbiosis-stream"></div>
+            <form id="evolution-note-form" class="symbiosis-note-composer" hidden>
+              <input id="evolution-note-attachments" type="file" accept="image/*" hidden disabled />
+              <div id="evolution-note-toolbar" class="evolution-note-toolbar" role="toolbar" aria-label="纪要格式" data-i18n-aria="notes_format">
+                <button type="button" data-note-format="heading" title="标题" aria-label="标题">H</button>
+                <button type="button" data-note-format="bold" title="加粗" aria-label="加粗">B</button>
+                <button type="button" data-note-format="italic" title="斜体" aria-label="斜体">I</button>
+                <button type="button" data-note-format="list" title="列表" aria-label="列表">•</button>
+                <button type="button" data-note-format="ordered-list" title="有序列表" aria-label="有序列表">1.</button>
+                <button type="button" data-note-format="quote" title="引用" aria-label="引用">❯</button>
+                <button type="button" data-note-format="code" title="行内代码" aria-label="行内代码">&lt;/&gt;</button>
+                <button type="button" data-note-format="strike" title="删除线" aria-label="删除线">S</button>
+                <button type="button" data-note-format="divider" title="分隔线" aria-label="分隔线">―</button>
+              </div>
+              <textarea id="evolution-note-input" rows="4" maxlength="12000" placeholder="记录这一次演化..." data-i18n-placeholder="record_evolution"></textarea>
+              <div class="symbiosis-composer-actions">
+                <button id="evolution-note-cancel" class="text-button" type="button" hidden data-i18n="cancel_edit">取消编辑</button>
+                <button id="evolution-note-publish" class="primary-button" type="submit" data-i18n="publish">发布</button>
+              </div>
+            </form>
+          </section>
+          <section id="evolution-blueprints-view" class="symbiosis-view" role="tabpanel" aria-labelledby="evolution-blueprints-tab" hidden>
+            <div class="symbiosis-blueprint-intro">
+              <strong>演化蓝图</strong>
+              <span data-i18n="record_blueprint">把未来方向、阶段目标和边界沉淀在这里。</span>
+            </div>
+            <div id="evolution-blueprints-list" class="symbiosis-stream"></div>
+            <form id="evolution-blueprint-form" class="symbiosis-note-composer" hidden>
+              <div id="evolution-blueprint-toolbar" class="evolution-note-toolbar" role="toolbar" aria-label="蓝图格式" data-i18n-aria="blueprint_format">
+                <button type="button" data-blueprint-format="heading" title="标题" aria-label="标题">H</button>
+                <button type="button" data-blueprint-format="bold" title="加粗" aria-label="加粗">B</button>
+                <button type="button" data-blueprint-format="italic" title="斜体" aria-label="斜体">I</button>
+                <button type="button" data-blueprint-format="list" title="列表" aria-label="列表">•</button>
+                <button type="button" data-blueprint-format="ordered-list" title="有序列表" aria-label="有序列表">1.</button>
+                <button type="button" data-blueprint-format="quote" title="引用" aria-label="引用">❯</button>
+                <button type="button" data-blueprint-format="code" title="行内代码" aria-label="行内代码">&lt;/&gt;</button>
+                <button type="button" data-blueprint-format="strike" title="删除线" aria-label="删除线">S</button>
+                <button type="button" data-blueprint-format="divider" title="分隔线" aria-label="分隔线">―</button>
+              </div>
+              <textarea id="evolution-blueprint-input" rows="4" maxlength="12000" placeholder="写下未来阶段、目标、边界与待验证的想法..." data-i18n-placeholder="record_blueprint"></textarea>
+              <div class="symbiosis-composer-actions">
+                <button id="evolution-blueprint-cancel" class="text-button" type="button" hidden data-i18n="cancel_edit">取消编辑</button>
+                <button id="evolution-blueprint-publish" class="primary-button" type="submit" data-i18n="publish_blueprint">发布蓝图</button>
+              </div>
+            </form>
+          </section>
+          <section id="feature-proposals-view" class="symbiosis-view" role="tabpanel" aria-labelledby="feature-proposals-tab" hidden>
+            <div id="feature-proposals-list" class="symbiosis-stream"></div>
+            <form id="feature-proposal-form" class="symbiosis-proposal-composer" hidden>
+              <select id="feature-proposal-type" aria-label="议案类型">
+                <option value="support" data-i18n="support_proposal">支持议案</option>
+                <option value="poll" data-i18n="poll_proposal">投票议案</option>
+              </select>
+              <div id="feature-proposal-support-fields" class="feature-proposal-fields">
+                <input id="feature-proposal-title" maxlength="140" placeholder="议案标题" data-i18n-placeholder="proposal_title" />
+                <textarea id="feature-proposal-input" rows="3" maxlength="4000" placeholder="写下要讨论的功能方向..." data-i18n-placeholder="proposal_description"></textarea>
+              </div>
+              <div id="feature-proposal-poll-fields" class="feature-proposal-fields" hidden>
+                <input id="feature-proposal-question" maxlength="140" placeholder="投票内容" data-i18n-placeholder="poll_question" />
+                <div id="feature-proposal-options" class="feature-proposal-options">
+                  <div class="feature-proposal-option-row">
+                    <input data-feature-proposal-option maxlength="140" placeholder="投票选项 1" />
+                    <button class="feature-proposal-remove-option" type="button" aria-label="删除投票选项" title="至少保留两个选项" disabled>×</button>
+                  </div>
+                  <div class="feature-proposal-option-row">
+                    <input data-feature-proposal-option maxlength="140" placeholder="投票选项 2" />
+                    <button class="feature-proposal-remove-option" type="button" aria-label="删除投票选项" title="至少保留两个选项" disabled>×</button>
+                  </div>
+                </div>
+                <button id="feature-proposal-add-option" class="text-button feature-proposal-add-option" type="button" data-i18n="add_option">增加选项</button>
+              </div>
+              <button class="primary-button" type="submit" data-i18n="publish_proposal">发布议案</button>
+            </form>
+          </section>
+        </section>
+
+        <section id="exception-workspace" class="symbiosis-workspace exception-workspace" aria-label="异常处理中心" hidden>
+          <header class="symbiosis-header">
+            <button id="exception-return" class="icon-button symbiosis-return" type="button" aria-label="返回聊天" title="返回聊天" data-i18n-aria="return_to_chat" data-i18n-title="return_to_chat">×</button>
+          </header>
+          <div class="symbiosis-tabs" role="tablist" aria-label="异常处理中心分页">
+            <button id="exception-monitor-tab" class="symbiosis-tab active" type="button" role="tab" aria-selected="true" data-i18n="exception_monitor">中控监测</button>
+            <button id="exception-archive-tab" class="symbiosis-tab" type="button" role="tab" aria-selected="false" data-i18n="exception_archive">异常档案</button>
+          </div>
+          <section id="exception-monitor-view" class="symbiosis-view" role="tabpanel" aria-labelledby="exception-monitor-tab">
+            <div class="exception-status-grid" aria-label="问题修复总览">
+              <article class="exception-status-card pending"><span data-i18n="pending">待处理</span><strong>—</strong><small data-i18n="data_placeholder">数据接口预留</small></article>
+              <article class="exception-status-card active"><span data-i18n="in_progress">处理中</span><strong>—</strong><small data-i18n="data_placeholder">数据接口预留</small></article>
+              <article class="exception-status-card resolved"><span data-i18n="resolved">已修复</span><strong>—</strong><small data-i18n="data_placeholder">数据接口预留</small></article>
+            </div>
+            <section class="exception-monitor-panel">
+              <div>
+                <p class="eyebrow">Control stream</p>
+                <h2 data-i18n="repair_overview">修复状态总览</h2>
+              </div>
+              <p>异常来源、影响范围、负责角色与修复进度将在数据接入后实时展示。</p>
+            </section>
+          </section>
+          <section id="exception-archive-view" class="symbiosis-view" role="tabpanel" aria-labelledby="exception-archive-tab" hidden>
+            <div class="exception-archive-empty">
+              <p class="eyebrow">Archive</p>
+              <h2 data-i18n="no_exception_archive">暂无异常档案</h2>
+              <p>后续会按时间、影响范围、处理状态和关联会话沉淀可追溯记录。</p>
+            </div>
+          </section>
+        </section>
+
+        <div id="message-wrap" class="message-wrap">
+          <div id="message-list" class="message-list"></div>
+          <button id="scroll-bottom" class="scroll-bottom" type="button" aria-label="滚动到底部" hidden>↓</button>
+        </div>
+
+        <div id="composer-privacy-bar" class="composer-privacy-bar">
+          <p class="composer-privacy-note"><span data-i18n="privacy_notice">您的隐私已被保护，上传文件最多在服务器保存30天</span> <span id="composer-privacy-info-wrap" class="composer-privacy-info-wrap"><button id="composer-privacy-info" class="composer-privacy-info" type="button" aria-label="查看数据训练说明" aria-describedby="composer-privacy-tooltip" aria-expanded="false">ⓘ</button><span id="composer-privacy-tooltip" class="composer-privacy-tooltip" role="tooltip" data-i18n="training_notice">根据供应商不同，您的数据可能被用于训练</span></span></p>
+        </div>
+        <div id="selected-skill-capability" class="selected-skill-capability" hidden></div>
+        <form id="message-form" class="composer">
+          <div id="file-form" class="file-form">
+            <button id="upload-trigger" class="upload-trigger" type="button" aria-label="上传文件" data-i18n-aria="upload_file">+</button>
+            <input id="file-input" type="file" multiple />
+          </div>
+          <textarea id="message-input" rows="1" placeholder="给 Hermi 发消息" data-i18n-placeholder="send_message"></textarea>
+          <button id="send-button" type="submit" data-i18n="send">发送</button>
+          <div id="file-list" class="file-list"></div>
+        </form>
+      </section>
+
+      <aside id="approval-panel" class="approval panel" aria-label="审批" data-i18n-aria="approvals">
+        <header class="panel-header">
+          <div>
+            <p id="right-panel-eyebrow" class="eyebrow">Approvals</p>
+            <h2 id="right-panel-title">审批</h2>
+          </div>
+          <div class="panel-header-actions right-panel-tab-nav">
+            <button id="right-panel-tab-prev" class="right-panel-tab-arrow" type="button" aria-label="查看前面的分页" title="前一页" data-i18n-aria="previous_tab" data-i18n-title="previous_tab">‹</button>
+            <div id="right-panel-tabs" class="right-panel-tabs">
+              <button id="approval-tools-button" class="right-panel-tab active" type="button" data-i18n="approvals">审批</button>
+              <button id="settings-tools-button" class="right-panel-tab" type="button" data-i18n="settings">设置</button>
+              <button id="temporary-tools-button" class="right-panel-tab" type="button" data-i18n="management">管理</button>
+              <button id="meeting-tools-button" class="right-panel-tab" type="button" data-i18n="meeting">会议</button>
+            </div>
+            <button id="right-panel-tab-next" class="right-panel-tab-arrow" type="button" aria-label="查看后面的分页" title="后一页" data-i18n-aria="next_tab" data-i18n-title="next_tab">›</button>
+            <button id="close-approvals" class="icon-button mobile-only" type="button" aria-label="关闭审批" data-i18n-aria="close_approvals">×</button>
+          </div>
+        </header>
+        <section id="approval-tools-view" class="right-panel-view" aria-label="审批列表">
+          <div id="approval-list" class="approval-list"></div>
+        </section>
+
+        <section id="meeting-tools-view" class="right-panel-view" aria-label="会议室设置" data-i18n-aria="meeting_room_settings" hidden>
+          <section class="admin-section meeting-control-section">
+            <p class="eyebrow">Meeting room</p>
+            <h2 id="meeting-panel-heading">新会议</h2>
+            <form id="meeting-form" class="meeting-form">
+              <label class="field-label">
+                <span data-i18n="meeting_room_name">会议室名称</span>
+                <input id="meeting-name" maxlength="80" placeholder="会议室" />
+              </label>
+              <label class="field-label">
+                <span data-i18n="meeting_mode">会议模式</span>
+                <select id="meeting-mode">
+                  <option value="auto_single">自动单次模式</option>
+                  <option value="pair_review">双人挑错模式</option>
+                  <option value="project_meeting">项目会议模式</option>
+                  <option value="engineering_pipeline">工程流水线模式</option>
+                </select>
+              </label>
+              <div class="meeting-grid">
+                <label class="field-label">
+                  <span data-i18n="max_rounds">最大轮数</span>
+                  <input id="meeting-rounds" type="number" min="1" max="50" value="2" />
+                </label>
+                <label class="field-label">
+                  <span data-i18n="permission">权限</span>
+                  <select id="meeting-permission">
+                    <option value="general">一般</option>
+                    <option value="smart" selected>智能</option>
+                    <option value="full">完整</option>
+                  </select>
+                </label>
+              </div>
+              <fieldset class="meeting-members-fieldset">
+                <legend>参会 AI</legend>
+                <div id="meeting-member-list" class="meeting-member-list"></div>
+              </fieldset>
+              <button id="meeting-save" class="primary-button" type="submit" data-i18n="create_meeting_room">创建会议室</button>
+            </form>
+            <div id="meeting-run-controls" class="meeting-run-controls" hidden>
+              <div id="meeting-run-status" class="meeting-run-status" data-i18n="not_started">尚未开始</div>
+              <button id="meeting-stop" class="secondary-button" type="button">停止</button>
+              <button id="meeting-resume" class="primary-button" type="button" data-i18n="resume">恢复</button>
+              <button id="meeting-cancel" class="danger-button" type="button">取消</button>
+            </div>
+          </section>
+        </section>
+
+        <section id="temporary-tools-modal" class="right-panel-view" aria-label="管理" hidden>
+          <section id="profile-name-section" class="admin-section" aria-label="人格显示名">
+            <p class="eyebrow">Profile names</p>
+            <h2>人格显示名</h2>
+            <div id="profile-name-list" class="profile-name-list"></div>
+          </section>
+          <section id="admin-section" class="admin-section" aria-label="用户管理">
+            <p class="eyebrow">Users</p>
+            <h2>用户管理</h2>
+            <form id="admin-user-form" class="admin-user-form">
+              <input id="admin-user-id" placeholder="user_id，如 friend:alice" />
+              <input id="admin-display-name" placeholder="显示名" />
+              <input id="admin-token" placeholder="token，可留空自动生成" />
+              <label id="admin-role-label" class="field-label">
+                <span>身份角色</span>
+                <select id="admin-role">
+                  <option value="friend">朋友</option>
+                  <option value="guest">访客</option>
+                </select>
+              </label>
+              <button type="submit">创建</button>
+            </form>
+            <div id="admin-user-list" class="admin-user-list"></div>
+          </section>
+          <section id="usage-section" class="admin-section" aria-label="用量">
+            <p class="eyebrow">Usage</p>
+            <div class="usage-heading">
+              <div class="usage-title-line">
+                <h2>用量</h2>
+                <span id="usage-total-tokens" class="usage-total-tokens">当前范围 Token 0</span>
+              </div>
+              <div id="usage-period-filters" class="usage-period-filters" role="group" aria-label="用量时间范围">
+                <button type="button" data-period="7d" aria-pressed="true">近7日</button>
+                <button type="button" data-period="30d" aria-pressed="false">近30日</button>
+                <button type="button" data-period="all" aria-pressed="false">全部</button>
+              </div>
+            </div>
+            <div id="usage-list" class="usage-list"></div>
+          </section>
+        </section>
+
+        <section id="settings-tools-modal" class="right-panel-view" aria-label="设置" hidden>
+          <section id="context-section" class="admin-section" aria-label="会话上下文">
+            <p class="eyebrow">Context</p>
+            <h2 data-i18n="current_conversation">当前会话</h2>
+            <div id="context-summary" class="context-summary"></div>
+          </section>
+          <section id="profile-section" class="admin-section" aria-label="本机人格">
+            <p class="eyebrow">Profiles</p>
+            <h2 data-i18n="local_profiles">本机人格</h2>
+            <div id="profile-list" class="status-card-list"></div>
+          </section>
+          <section id="meeting-preset-section" class="admin-section" aria-label="会议模式">
+            <p class="eyebrow">Meeting</p>
+            <h2 data-i18n="meeting_modes">会议模式</h2>
+            <div id="meeting-preset-list" class="status-card-list"></div>
+          </section>
+          <section id="brain-section" class="admin-section" aria-label="主脑">
+            <p class="eyebrow">Brain</p>
+            <h2>主脑</h2>
+            <div id="brain-status-list" class="status-card-list"></div>
+          </section>
+          <section id="prompt-section" class="admin-section" aria-label="Prompt">
+            <p class="eyebrow">Prompt</p>
+            <h2>Prompt绑定</h2>
+            <div id="prompt-binding-list" class="status-card-list"></div>
+          </section>
+          <section id="capability-section" class="admin-section" aria-label="能力">
+            <p class="eyebrow">Capabilities</p>
+            <h2 data-i18n="capabilities">能力</h2>
+            <div id="capability-list" class="capability-list"></div>
+            <form id="action-validate-form" class="action-validate-form">
+              <textarea id="action-validate-input" rows="4" spellcheck="false" placeholder='{"type":"qq.send","message":"你好","target":{"chat_type":"private","user_id":"1000000001"}}'></textarea>
+              <button type="submit">校验 Action</button>
+            </form>
+            <div id="action-validate-result" class="action-validate-result"></div>
+          </section>
+          <section id="task-section" class="admin-section" aria-label="任务">
+            <p class="eyebrow">Tasks</p>
+            <h2 data-i18n="tasks">任务</h2>
+            <div id="task-list" class="task-list"></div>
+          </section>
+        </section>
+      </aside>
+
+      <div id="scheduled-job-detail-modal" class="modal-backdrop" hidden>
+        <section class="modal-panel compact-modal" aria-label="定时任务详情">
+          <header class="panel-header">
+            <div>
+              <p class="eyebrow">Scheduled job</p>
+              <h2 data-i18n="scheduled_job">定时任务</h2>
+            </div>
+            <button id="scheduled-job-detail-close" class="icon-button" type="button" aria-label="关闭定时任务详情">×</button>
+          </header>
+          <div id="scheduled-job-detail" class="detail-grid"></div>
+          <button id="scheduled-job-delete" class="danger-button" type="button" data-i18n="delete">删除</button>
+        </section>
+      </div>
+
+      <div id="confirm-modal" class="modal-backdrop" hidden>
+        <section class="modal-panel confirm-panel" aria-label="确认操作">
+          <h2 id="confirm-title">确认</h2>
+          <p id="confirm-message" class="confirm-message"></p>
+          <div class="confirm-actions">
+            <button id="confirm-cancel" class="secondary-button" type="button">取消</button>
+            <button id="confirm-ok" class="danger-button" type="button">确认</button>
+          </div>
+        </section>
+      </div>
+
+      <div id="account-notice-modal" class="modal-backdrop" hidden>
+        <section class="modal-panel account-notice-panel" aria-label="账户通知" aria-modal="true" role="dialog">
+          <header class="panel-header">
+            <div>
+              <p class="notice-attention">ACCOUNT NOTICE</p>
+              <h2 id="account-notice-title">账户通知</h2>
+            </div>
+          </header>
+          <p id="account-notice-message" class="confirm-message"></p>
+          <div class="confirm-actions">
+            <button id="account-notice-confirm" class="primary-button" type="button">知道了</button>
+          </div>
+        </section>
+      </div>
+
+      <div id="usage-guide-modal" class="modal-backdrop" hidden>
+        <section class="modal-panel usage-guide-panel" aria-label="使用指南" aria-modal="true" role="dialog">
+          <header class="panel-header">
+            <div>
+              <p class="eyebrow">Quick start</p>
+              <h2 data-i18n="usage_guide">使用指南</h2>
+            </div>
+          </header>
+          <div class="usage-guide-steps">
+            <section>
+              <strong data-i18n="guide_start">从会话开始</strong>
+              <p data-i18n="guide_start_copy">左侧可新建或切换会话；右侧“设置”里的“能力”可为下一条请求选择合适流程。</p>
+            </section>
+            <section>
+              <strong data-i18n="guide_usage">查看 Token 使用量</strong>
+              <p data-i18n="guide_usage_copy">点击左下角括号中的账户名称，可查看剩余额度；“账户设置”里可查看和修改自己的基础信息。当前会话用量在右侧“设置”的会话统计中。</p>
+            </section>
+            <section>
+              <strong data-i18n="guide_rename">修改会话名称</strong>
+              <p data-i18n="guide_rename_copy">把鼠标移到左侧会话名称上，点击铅笔图标，直接输入新名称后按对勾保存。</p>
+            </section>
+            <section>
+              <strong data-i18n="guide_approvals">审批与外部操作</strong>
+              <p data-i18n="guide_approvals_copy">文件、联网、QQ、定时和本机操作会按权限与审批执行；不要把 token 或私人信息发到会话里。</p>
+            </section>
+            <section>
+              <strong data-i18n="guide_modes">聊天模式与能力</strong>
+              <p data-i18n="guide_modes_copy">聊天模式更接近日常对话；专业模式会把角色名称、思考过程和正文按工作流展开。能力一次只选择一项，可在输入框上方点 × 取消；发送完成后会自动清除本次选择。</p>
+            </section>
+          </div>
+          <div class="confirm-actions">
+            <button id="usage-guide-dismiss" class="secondary-button" type="button" data-i18n="do_not_show_again">不再提示</button>
+            <button id="usage-guide-confirm" class="primary-button" type="button" data-i18n="confirm">确认</button>
+          </div>
+        </section>
+      </div>
+
+      <div id="account-settings-modal" class="modal-backdrop" hidden>
+        <section class="modal-panel account-settings-panel" aria-label="账户设置" aria-modal="true" role="dialog">
+          <header class="panel-header">
+            <div>
+              <p class="eyebrow">Account</p>
+              <h2>账户设置</h2>
+            </div>
+          </header>
+          <dl id="account-settings-summary" class="my-summary-list" aria-live="polite"></dl>
+          <div class="confirm-actions">
+            <button id="account-request-quota-button" class="secondary-button" type="button" data-i18n="request_temporary_quota">申请临时额度</button>
+            <button id="account-settings-close" class="primary-button" type="button" data-i18n="close">关闭</button>
+          </div>
+        </section>
+      </div>
+
+      <div id="user-info-modal" class="modal-backdrop" hidden>
+        <section class="modal-panel user-info-panel" role="dialog" aria-modal="true" aria-labelledby="user-info-title">
+          <header class="modal-heading">
+            <div>
+              <p class="eyebrow">User context</p>
+              <h2 id="user-info-title" data-i18n="user_information">用户信息</h2>
+              <p id="user-info-subtitle" class="modal-copy"></p>
+            </div>
+          </header>
+          <p class="modal-copy">仅在该用户的首次对话，或本页内容变更后的下一条消息中提供给对应人格。</p>
+          <div class="user-info-fields">
+            <label><span data-i18n="user_relationship">用户关系</span>
+              <textarea id="user-info-relationship" maxlength="240" placeholder="例如：朋友、同事；与我是什么关系"></textarea>
+              <button type="button" class="secondary-button" data-user-profile-field="relationship">保存关系</button>
+            </label>
+            <label><span data-i18n="user_preferences">用户喜好</span>
+              <textarea id="user-info-preferences" maxlength="240" placeholder="例如：喜欢的称呼、话题、沟通习惯"></textarea>
+              <button type="button" class="secondary-button" data-user-profile-field="preferences">保存喜好</button>
+            </label>
+            <label><span data-i18n="user_recent_focus">用户近期</span>
+              <textarea id="user-info-recent-focus" maxlength="240" placeholder="例如：最近正在做什么、需要留意什么"></textarea>
+              <button type="button" class="secondary-button" data-user-profile-field="recent_focus">保存近期</button>
+            </label>
+          </div>
+          <p id="user-info-status" class="form-status" role="status"></p>
+        </section>
+      </div>
+
+      <div id="evolution-update-modal" class="modal-backdrop" hidden>
+        <section class="modal-panel evolution-update-panel" aria-label="近期更新">
+          <header class="panel-header">
+            <div>
+              <p class="eyebrow">Recent updates</p>
+              <h2 data-i18n="recent_updates">近期有演化更新</h2>
+            </div>
+          </header>
+          <p id="evolution-update-summary" class="confirm-message"></p>
+          <div id="evolution-update-list" class="evolution-update-list"></div>
+          <div class="confirm-actions">
+            <button id="evolution-update-close" class="primary-button" type="button" data-i18n="understood">知道了</button>
+          </div>
+        </section>
+      </div>
+
+      <div id="new-conversation-modal" class="modal-backdrop" hidden>
+        <section class="modal-panel profile-picker-panel" aria-label="选择会话角色">
+          <header class="panel-header">
+            <div>
+              <p class="eyebrow">Conversation link</p>
+              <h2 data-i18n="select_conversation_role">选择对话角色</h2>
+            </div>
+            <button id="new-conversation-cancel" class="icon-button" type="button" aria-label="关闭角色选择">×</button>
+          </header>
+          <div class="profile-picker-layout">
+            <div class="profile-choice-list" role="listbox" aria-label="可用角色" data-i18n-aria="available_roles">
+              <button id="new-conversation-vera" class="profile-choice" type="button" data-profile-id="maid" role="option" aria-selected="true">
+                <span class="profile-portrait profile-portrait-vera" aria-hidden="true"></span>
+                <strong>薇拉(Vera)</strong>
+                <span class="profile-choice-status" data-i18n="available">可创建</span>
+              </button>
+              <button id="new-conversation-veda" class="profile-choice" type="button" data-profile-id="trainee" role="option" aria-selected="false">
+                <span class="profile-portrait profile-portrait-veda" aria-hidden="true"></span>
+                <strong>薇达(Veda)</strong>
+                <span class="profile-choice-status" data-i18n="under_construction">施工中</span>
+              </button>
+              <button id="new-conversation-ember" class="profile-choice" type="button" data-profile-id="imouto" role="option" aria-selected="false">
+                <span class="profile-portrait profile-portrait-ember" aria-hidden="true"></span>
+                <strong>小墨(Ember)</strong>
+                <span class="profile-choice-status" data-i18n="under_construction">施工中</span>
+              </button>
+            </div>
+            <article class="profile-brief" aria-label="角色信息预留">
+              <div class="profile-brief-head">
+                <div>
+                  <p class="profile-brief-kicker" data-i18n="selected">已选择</p>
+                  <h3 id="selected-profile-name">薇拉(Vera)</h3>
+                </div>
+                <span id="selected-profile-state" class="profile-status" data-i18n="available">可创建</span>
+              </div>
+              <p id="selected-profile-notice" class="profile-picker-notice" role="status"></p>
+              <div class="profile-radar-wrap" aria-label="能力六边形预留">
+                <div class="profile-radar" aria-hidden="true">
+                  <span class="radar-core"></span>
+                  <span class="radar-label radar-label-plan"></span>
+                  <span class="radar-label radar-label-execute"></span>
+                  <span class="radar-label radar-label-collab"></span>
+                  <span class="radar-label radar-label-review"></span>
+                  <span class="radar-label radar-label-memory"></span>
+                  <span class="radar-label radar-label-schedule"></span>
+                </div>
+                <div class="profile-ability-copy" aria-hidden="true">
+                  <span>六边形</span>
+                  <small>施工中</small>
+                </div>
+              </div>
+              <div class="profile-intro-slot" aria-hidden="true">
+                <span>姓名介绍</span>
+                <small>施工中</small>
+              </div>
+            </article>
+            <article class="profile-stage" aria-label="角色形象预留">
+              <div class="profile-stage-grid" aria-hidden="true"></div>
+              <div class="profile-figure-slot" aria-hidden="true">
+                <span>角色形象</span>
+                <small>施工中 (•̀ᴗ•́)و</small>
+              </div>
+            </article>
+          </div>
+          <div class="confirm-actions">
+            <button id="new-conversation-dismiss" class="secondary-button" type="button" data-i18n="cancel_new_conversation">取消</button>
+            <button id="new-conversation-confirm" class="primary-button" type="button" data-i18n="confirm_new_conversation">确认新建</button>
+          </div>
+        </section>
+      </div>
+
+      <div id="perm-detail-modal" class="modal-backdrop" hidden>
+        <section class="modal-panel" aria-label="权限配置详情">
+          <header class="panel-header">
+            <div>
+              <p class="eyebrow">Permission</p>
+              <h2 id="perm-detail-title" data-i18n="permission_configuration">权限配置</h2>
+            </div>
+            <button id="perm-detail-close" class="icon-button" type="button" aria-label="关闭权限配置">×</button>
+          </header>
+          <div id="perm-detail-body" class="perm-detail-body"></div>
+          <div class="perm-detail-actions">
+            <button id="perm-detail-cancel" class="secondary-button" type="button" data-i18n="cancel">取消</button>
+            <button id="perm-detail-save" class="primary-button" type="button" data-i18n="save">保存</button>
+          </div>
+        </section>
+      </div>
+    </main>
+    <script src="/admin_tools.js"></script>
+    <script src="/message_ui.js"></script>
+    <script src="/trace_ui.js"></script>
+    <script src="/meeting_state.js"></script>
+    <script src="/meeting_api.js"></script>
+    <script src="/meeting_ui.js"></script>
+    <script src="/permissions_panel.js"></script>
+    <script src="/scheduled_jobs.js"></script>
+    <script src="/i18n.js"></script>
+    <script src="/app.js"></script>
+  </body>
+</html>
+

@@ -1,0 +1,9 @@
+{
+  "name": "Hermi",
+  "short_name": "Hermi",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f5ef",
+  "theme_color": "#111827"
+}
+
